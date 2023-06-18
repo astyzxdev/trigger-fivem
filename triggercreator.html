@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trigger Creator</title>
+    <style>
+        @font-face {
+            font-family: Gotham;
+            src: url(Gotham_Bold.otf);
+        }
+
+        body {
+            background-color: rgb(118, 121, 141);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #triggerForm {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: rgb(255, 255, 255);
+            padding-bottom: 45px;
+            padding-left: 45px;
+            padding-right: 45px;
+            padding-top: 90px;
+            
+            border-radius: 5px;
+
+            box-shadow: 0px 0px 38px -15px rgba(0,0,0,0.75);
+        }
+
+        label {
+            position: relative;
+            right: 7px;
+            font-family: Gotham;
+        }
+
+        input {
+            background-color: rgb(156, 156, 156);
+            border: none;
+            font-family: Gotham;
+            color: white;
+            padding: 5px;
+            border-radius: 4px;
+        }
+
+        input:focus {
+            outline: none;
+        }
+
+        button {
+            background-color: #007fff;
+            color: white;
+            outline: none;
+            border: none;
+            padding: 5px;
+            width: 190px;
+            height: 40px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: Gotham;
+        }
+
+        img {
+            position: relative;
+            bottom: 40px;
+            width: 250px;
+            height: 66px;
+        }
+
+        #iloop {
+            position: relative;
+            right: 55px;
+        }
+
+        #delay::placeholder {
+            color: rgb(219, 219, 219);
+        }
+    </style>
+</head>
+<body>
+    <form id="triggerForm">
+        <img src="Tittle.png">
+
+        <label for="param1">Primeiro Parâmetro:</label>
+        <input type="text" id="param1" name="param1" required>
+    
+        <br>
+    
+        <label for="param2">Segundo Parâmetro:</label>
+        <input type="text" id="param2" name="param2" required>
+    
+        <br>
+
+        <label id="iloop" for="loop">
+            <input type="checkbox" id="loop" name="loop" onchange="show()">
+            Loop?
+        </label>
+    
+        <div class="delay">
+
+        </div>
+    
+        <br>
+
+        <button type="submit" onclick="change()">Criar Trigger</button>
+    </form>
+
+    <script>
+        
+        function change() {
+            let triggerName = document.querySelector('#param1').value;
+            let triggerParams = document.querySelector('#param2').value;
+            let value = document.getElementById('loop');
+
+            if (value.checked) {
+                let delay = document.getElementById('delay').value;
+
+                if (!delay || isNaN(delay)) return alert('Número Inválido no Delay.');
+
+                let codeGenerated = `CreateThread(function()
+                    while true do
+                        Wait(${delay} * 1000)
+                        local params = json.decode('${triggerParams}')
+                        TriggerEvent('${triggerName}', table.unpack(params))
+                    end
+                end)`;
+
+                navigator.clipboard.writeText(codeGenerated);
+            } else {
+                let codeGenerated = `CreateThread(function()
+                local params = json.decode('${triggerParams}')
+                TriggerEvent('${triggerName}', table.unpack(params))
+            end)`;
+
+                navigator.clipboard.writeText(codeGenerated);
+            };
+
+            alert('⚡ - Trigger Copiada!');
+        };
+
+        function show() {
+            let value = document.getElementById('loop');
+
+            if (value.checked) {
+                document.querySelector('.delay').innerHTML = `<br><input type="text" id="delay" placeholder="Delay [EM SEGUNDOS]" required>`;
+            } else {
+                document.querySelector('.delay').innerHTML = '';
+            };
+        };
+    </script>
+</body>
+</html>
